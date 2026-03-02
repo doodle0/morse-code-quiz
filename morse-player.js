@@ -73,6 +73,11 @@ class MorsePlayer {
     getLetters() {
         return Object.keys(MORSE_CODE).filter(c => c >= 'A' && c <= 'Z');
     }
+
+    /** Returns only digits (0-9) */
+    getDigits() {
+        return Object.keys(MORSE_CODE).filter(c => c >= '0' && c <= '9');
+    }
 }
 
 const morsePlayer = new MorsePlayer(soundEngine);

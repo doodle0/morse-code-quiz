@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const reportSummaryEl = document.getElementById('reportSummary');
     const reportBodyEl    = document.getElementById('reportBody');
+    const charStatsBodyEl = document.getElementById('charStatsBody');
     const newSessionBtn   = document.getElementById('newSessionBtn');
 
     // --- State ---
@@ -70,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
             wpm:           +sWpm.value,
             frequency:     +sFreq.value,
             timeLimitSecs: +sTimelimit.value, // 0 = off
+            includeDigits: document.getElementById('s-digits').checked,
         };
         morsePlayer.wpm       = settings.wpm;
         morsePlayer.frequency = settings.frequency;
@@ -113,8 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function pickRandom() {
-        const letters = morsePlayer.getLetters();
-        return letters[Math.floor(Math.random() * letters.length)];
+        const pool = settings.includeDigits
+            ? morsePlayer.getCharacters()
+            : morsePlayer.getLetters();
+        return pool[Math.floor(Math.random() * pool.length)];
     }
 
     async function playChar() {
@@ -224,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             char:      question.char,
             correct,
             attempts:  question.attemptsUsed,
-            timeTaken: ((Date.now() - question.startTime) / 1000).toFixed(1),
+            timeTaken: (Date.now() - question.startTime) / 1000,
         });
     }
 
@@ -246,6 +250,24 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             hintEl.innerHTML = 'Press <kbd>Space</kbd> to replay \u00b7 Type any letter to answer';
         }
+    }
+
+    // --- Per-character aggregation ---
+    function aggregateByChar(log) {
+        const map = {};
+        for (const entry of log) {
+            if (!map[entry.char]) map[entry.char] = { count: 0, totalTries: 0, totalTime: 0 };
+            map[entry.char].count++;
+            map[entry.char].totalTries += entry.attempts;
+            map[entry.char].totalTime  += entry.timeTaken;
+        }
+        return Object.entries(map).map(([char, s]) => ({
+            char,
+            pattern:  morsePlayer.getMorsePattern(char),
+            count:    s.count,
+            avgTries: s.totalTries / s.count,
+            avgTime:  s.totalTime  / s.count,
+        })).sort((a, b) => b.avgTime - a.avgTime);
     }
 
     // --- Session end ---
@@ -279,7 +301,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 <td class="pattern">${morsePlayer.getMorsePattern(q.char)}</td>
                 <td>${q.correct ? '✓' : '✗'}</td>
                 <td>${q.attempts}</td>
-                <td>${q.timeTaken}s</td>
+                <td>${q.timeTaken.toFixed(1)}s</td>
+            </tr>
+        `).join('');
+
+        const charStats = aggregateByChar(session.log);
+        charStatsBodyEl.innerHTML = charStats.map(s => `
+            <tr>
+                <td><strong>${s.char}</strong></td>
+                <td class="pattern">${s.pattern}</td>
+                <td>${s.count}</td>
+                <td>${s.avgTries.toFixed(1)}</td>
+                <td>${s.avgTime.toFixed(1)}s</td>
             </tr>
         `).join('');
     }

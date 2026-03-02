@@ -29,6 +29,12 @@
                     <label>Time limit: <strong id="s-timelimitVal">10s</strong></label>
                     <input type="range" id="s-timelimit" min="0.5" max="10" value="5" step="0.5">
                 </div>
+                <div class="setting-row setting-row--checkbox">
+                    <label>
+                        <input type="checkbox" id="s-digits">
+                        Include digits (0–9)
+                    </label>
+                </div>
             </div>
             <button id="startSessionBtn" class="btn-primary">Start Session</button>
         </div>
@@ -74,6 +80,19 @@
                     </tr>
                 </thead>
                 <tbody id="reportBody"></tbody>
+            </table>
+            <h3 class="section-heading">By Character</h3>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Char</th>
+                        <th>Pattern</th>
+                        <th>Asked</th>
+                        <th>Avg Tries</th>
+                        <th>Avg Time</th>
+                    </tr>
+                </thead>
+                <tbody id="charStatsBody"></tbody>
             </table>
             <button id="newSessionBtn" class="btn-primary">Start New Session</button>
         </div>
