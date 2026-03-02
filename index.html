@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morse Code Trainer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Session Start -->
+    <div id="screen-start" class="screen">
+        <div class="container">
+            <h1>Morse Code Trainer</h1>
+            <div class="settings">
+                <div class="setting-row">
+                    <label>Questions per session: <strong id="s-questionsVal">10</strong></label>
+                    <input type="range" id="s-questions" min="5" max="50" value="10" step="5">
+                </div>
+                <div class="setting-row">
+                    <label>Speed: <strong id="s-wpmVal">5</strong> WPM</label>
+                    <input type="range" id="s-wpm" min="1" max="25" value="5" step="1">
+                </div>
+                <div class="setting-row">
+                    <label>Frequency: <strong id="s-freqVal">600</strong> Hz</label>
+                    <input type="range" id="s-freq" min="400" max="900" value="600" step="50">
+                </div>
+                <div class="setting-row">
+                    <label>Time limit: <strong id="s-timelimitVal">10s</strong></label>
+                    <input type="range" id="s-timelimit" min="0.5" max="10" value="5" step="0.5">
+                </div>
+            </div>
+            <button id="startSessionBtn" class="btn-primary">Start Session</button>
+        </div>
+    </div>
+
+    <!-- Quiz -->
+    <div id="screen-quiz" class="screen hidden">
+        <div class="container">
+            <div class="quiz-header">
+                <span>Q <strong id="questionNum">1</strong>/<strong id="questionTotal">10</strong></span>
+                <span>Score <strong id="score">0</strong></span>
+                <span>Streak <strong id="streak">0</strong></span>
+            </div>
+            <div id="timerBarWrap" class="timer-bar-wrap">
+                <div id="timerBar" class="timer-bar"></div>
+            </div>
+            <div class="quiz-body">
+                <div class="attempts-row">
+                    <span class="attempt-dot active" id="dot0"></span>
+                    <span class="attempt-dot active" id="dot1"></span>
+                    <span class="attempt-dot active" id="dot2"></span>
+                </div>
+                <div id="feedback" class="feedback hidden"></div>
+                <p id="hint" class="hint"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session End -->
+    <div id="screen-end" class="screen hidden">
+        <div class="container container--wide">
+            <h2>Session Complete</h2>
+            <div id="reportSummary" class="report-summary"></div>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Char</th>
+                        <th>Pattern</th>
+                        <th>Result</th>
+                        <th>Tries</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="reportBody"></tbody>
+            </table>
+            <button id="newSessionBtn" class="btn-primary">Start New Session</button>
+        </div>
+    </div>
+
+    <script src="sound-engine.js"></script>
+    <script src="morse-player.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
