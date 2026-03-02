@@ -176,3 +176,53 @@ h1, h2 {
     color: var(--pico-muted-color);
     text-transform: uppercase;
 }
+
+/* Character input boxes (multi-char mode) */
+
+.char-boxes {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.char-box {
+    width: 2.5rem;
+    height: 3rem;
+    border: var(--pico-border-width) solid var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    font-weight: bold;
+    position: relative;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.char-box.cursor {
+    border-color: var(--pico-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--pico-primary) 25%, transparent);
+}
+
+.char-box.box-correct {
+    background: color-mix(in srgb, var(--pico-color-green-550) 15%, transparent);
+    border-color: var(--pico-color-green-550);
+    color: var(--pico-color-green-550);
+}
+
+.char-box.box-wrong {
+    background: color-mix(in srgb, var(--pico-color-red-550) 15%, transparent);
+    border-color: var(--pico-color-red-550);
+    color: var(--pico-color-red-550);
+}
+
+.char-reveal {
+    display: block;
+    font-size: 0.5em;
+    font-weight: normal;
+    color: var(--pico-muted-color);
+    line-height: 1;
+    margin-top: 1px;
+}

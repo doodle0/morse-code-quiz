@@ -4,12 +4,6 @@
 
 - Persist stats across sessions (localStorage)
 - Highlight "worst" character rows in the per-character table
-- **Replay costs an attempt**: pressing Space in `awaiting` should decrement
-  `attemptsLeft` and update the dots. When `attemptsLeft` reaches 0, Space
-  should be blocked — instead show a brief message (e.g. "No replays left —
-  type your answer") and do not replay or transition state. The timeout and
-  wrong-answer paths are unchanged.
-
 ## Punctuation support
 
 Standard ITU Morse includes punctuation (`. , ? / = - ( )` etc.). Each is a
@@ -35,5 +29,7 @@ answer model breaks. Two realistic options:
    SK). Simple, but requires the user to learn a custom mapping — show a
    reference on the settings or quiz screen.
 2. **Multi-key input**: collect a short sequence of keystrokes (e.g. "S" then
-   "K") and match the full string. Needs a input-buffer state and a commit
-   trigger (Enter or timeout), which is a more significant model change.
+   "K") and match the full string. The input-buffer model now exists (multi-char
+   mode), so the infrastructure is mostly in place; the main remaining question
+   is how to represent prosigns in the character pool and what letter sequence
+   the user types.

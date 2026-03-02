@@ -25,6 +25,7 @@ class SoundEngine {
         this.masterGain.connect(this.audioContext.destination);
         this.masterGain.gain.value = 0.3; // Set volume to 30% to avoid being too loud
 
+        this.activeOscillators = [];
         this.isInitialized = true;
         console.log('Sound engine initialized');
     }
@@ -67,11 +68,41 @@ class SoundEngine {
         gainNode.gain.setValueAtTime(1, end - releaseTime);
         gainNode.gain.linearRampToValueAtTime(0, end);
 
+        // Track oscillator so stopAll() can cancel it; clean up on natural end
+        this.activeOscillators.push(oscillator);
+        oscillator.addEventListener('ended', () => {
+            const idx = this.activeOscillators.indexOf(oscillator);
+            if (idx !== -1) this.activeOscillators.splice(idx, 1);
+        });
+
         // Start and stop the oscillator
         oscillator.start(start);
         oscillator.stop(end);
 
         return end;
+    }
+
+    /**
+     * Immediately silence and cancel all scheduled/playing oscillators.
+     * Ramps master gain to 0 first to avoid a click, then stops oscillators
+     * and restores gain for the next playback.
+     */
+    stopAll() {
+        if (!this.audioContext || !this.masterGain) return;
+        const now = this.audioContext.currentTime;
+
+        // Ramp master gain to 0 in 10ms to avoid click
+        this.masterGain.gain.cancelScheduledValues(now);
+        this.masterGain.gain.setValueAtTime(0.3, now);
+        this.masterGain.gain.linearRampToValueAtTime(0, now + 0.01);
+
+        // Stop all tracked oscillators after the ramp completes
+        const oscs = this.activeOscillators;
+        this.activeOscillators = [];
+        oscs.forEach(osc => { try { osc.stop(now + 0.015); } catch (e) {} });
+
+        // Restore gain so the next playback is audible
+        this.masterGain.gain.setValueAtTime(0.3, now + 0.02);
     }
 
     /**

@@ -15,34 +15,48 @@
         <article>
             <h1>Morse Code Trainer</h1>
             <section class="settings">
+                <fieldset>
+                    <legend>Mode</legend>
+                    <label>
+                        <input type="radio" name="s-mode" id="s-mode-single" value="single" checked>
+                        Single-character
+                    </label>
+                    <label>
+                        <input type="radio" name="s-mode" id="s-mode-multi" value="multi">
+                        Multi-character
+                    </label>
+                </fieldset>
+                <div class="setting-row" id="s-charsPerQ-row" hidden>
+                    <label>Characters per question: <strong id="s-charsPerQVal">2</strong></label>
+                    <input type="range" id="s-charsPerQ" min="2" max="10" value="2" step="1">
+                </div>
                 <div class="setting-row">
                     <label>Questions per session: <strong id="s-questionsVal">10</strong></label>
                     <input type="range" id="s-questions" min="5" max="50" value="10" step="5">
                 </div>
                 <div class="setting-row">
                     <label>Speed: <strong id="s-wpmVal">5</strong> WPM</label>
-                    <input type="range" id="s-wpm" min="1" max="25" value="5" step="1">
+                    <input type="range" id="s-wpm" min="5" max="50" value="5" step="1">
                 </div>
                 <div class="setting-row">
                     <label>Frequency: <strong id="s-freqVal">600</strong> Hz</label>
                     <input type="range" id="s-freq" min="400" max="900" value="600" step="50">
                 </div>
                 <div class="setting-row">
-                    <label>Time limit: <strong id="s-timelimitVal">5 s</strong></label>
+                    <label>Time limit per character: <strong id="s-timelimitVal">5 s</strong></label>
                     <input type="range" id="s-timelimit" min="0" max="10" value="5" step="0.5">
                 </div>
-                <div class="setting-row">
+                <fieldset>
+                    <legend>Character sets</legend>
                     <label>
                         <input type="checkbox" id="s-letters" role="switch" checked>
                         Letters (A–Z)
                     </label>
-                </div>
-                <div class="setting-row">
                     <label>
                         <input type="checkbox" id="s-digits" role="switch">
                         Digits (0–9)
                     </label>
-                </div>
+                </fieldset>
             </section>
             <button id="startSessionBtn" class="btn-primary">Start Session</button>
         </article>
@@ -67,6 +81,7 @@
                 </section>
             </section>
             <div class="quiz-body">
+                <div id="charBoxes" class="char-boxes" hidden></div>
                 <div id="feedback" class="feedback hidden"></div>
                 <div class="hint"><small id="hint"></small></div>
             </div>
@@ -80,27 +95,14 @@
             <div id="reportSummary" class="report-summary"></div>
             <table class="report-table">
                 <thead>
-                    <tr>
-                        <th><small>#</small></th>
-                        <th><small>Char</small></th>
-                        <th><small>Pattern</small></th>
-                        <th><small>Result</small></th>
-                        <th><small>Tries</small></th>
-                        <th><small>Time</small></th>
-                    </tr>
+                    <tr id="reportHead"></tr>
                 </thead>
                 <tbody id="reportBody"></tbody>
             </table>
             <h3 class="section-heading">By Character</h3>
             <table class="report-table">
                 <thead>
-                    <tr>
-                        <th><small>Char</small></th>
-                        <th><small>Pattern</small></th>
-                        <th><small>Asked</small></th>
-                        <th><small>Avg Tries</small></th>
-                        <th><small>Avg Time</small></th>
-                    </tr>
+                    <tr id="charStatsHead"></tr>
                 </thead>
                 <tbody id="charStatsBody"></tbody>
             </table>

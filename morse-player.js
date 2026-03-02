@@ -78,6 +78,41 @@ class MorsePlayer {
     getDigits() {
         return Object.keys(MORSE_CODE).filter(c => c >= '0' && c <= '9');
     }
+
+    /**
+     * Play morse code for a sequence of characters with proper inter-character gaps
+     * @param {string[]} characters - Array of characters to play
+     * @returns {Promise} Resolves when playback finishes
+     */
+    async playSequence(characters) {
+        this.soundEngine.init();
+        await this.soundEngine.resume();
+
+        const dotMs   = this.dotMs;
+        const dashMs  = dotMs * 3;
+        const elemGap = dotMs / 1000;
+        const charGap = (dotMs * 3) / 1000; // 3× dot inter-character gap (PARIS standard)
+
+        let time    = this.soundEngine.getCurrentTime();
+        let endTime = time;
+
+        for (let ci = 0; ci < characters.length; ci++) {
+            const code = MORSE_CODE[characters[ci].toUpperCase()];
+            if (!code) continue;
+
+            if (ci > 0) time = endTime + charGap;
+
+            for (let i = 0; i < code.length; i++) {
+                const durationMs = code[i] === '.' ? dotMs : dashMs;
+                endTime = this.soundEngine.playTone(this.frequency, durationMs, time);
+                time = endTime;
+                if (i < code.length - 1) time += elemGap;
+            }
+        }
+
+        const remainingMs = (endTime - this.soundEngine.getCurrentTime()) * 1000;
+        return new Promise(resolve => setTimeout(resolve, Math.max(0, remainingMs)));
+    }
 }
 
 const morsePlayer = new MorsePlayer(soundEngine);
