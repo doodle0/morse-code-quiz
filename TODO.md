@@ -4,6 +4,7 @@
 
 - Persist stats across sessions (localStorage)
 - Highlight "worst" character rows in the per-character table
+
 ## Punctuation support
 
 Standard ITU Morse includes punctuation (`. , ? / = - ( )` etc.). Each is a

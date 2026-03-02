@@ -133,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         session.index++;
         feedbackEl.className = 'feedback hidden';
-        updateDots();
 
         if (isMulti()) {
             question = {
@@ -156,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             charBoxesEl.hidden = true;
         }
+        updateDots();
 
         questionNumEl.textContent = session.index;
         scoreEl.textContent       = session.correctCount;
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function setHint(s) {
         if (s === 'playing') {
             if (isMulti()) {
-                hintEl.textContent = 'Playing\u2026 — type ahead as you hear the characters';
+                hintEl.innerHTML = 'Playing\u2026 \u2014 type ahead as you hear the characters \u00b7 <kbd>Backspace</kbd> to delete';
             } else {
                 hintEl.textContent = 'Playing\u2026';
             }
