@@ -1,12 +1,5 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 0;
     min-height: 100vh;
 }
 
@@ -17,112 +10,42 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: var(--pico-spacing);
 }
 
 .screen.hidden {
     display: none;
 }
 
-/* Containers */
-
-.container {
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    max-width: 480px;
+.screen > article {
     width: 100%;
 }
 
-.container--wide {
-    max-width: 680px;
-}
-
-h1 {
-    color: #333;
+h1, h2 {
     text-align: center;
-    margin-bottom: 32px;
-    font-size: 2em;
 }
 
-h2 {
-    color: #333;
-    text-align: center;
-    margin-bottom: 28px;
-    font-size: 1.6em;
-}
-
-/* Settings */
-
-.settings {
-    margin-bottom: 28px;
-}
-
-.setting-row {
-    margin-bottom: 20px;
-}
-
-.setting-row label {
-    display: block;
-    color: #555;
-    margin-bottom: 8px;
-    font-size: 0.95em;
-}
-
-input[type="range"] {
-    width: 100%;
-    accent-color: #667eea;
-    cursor: pointer;
-}
-
-/* Primary button */
+/* Button */
 
 .btn-primary {
     width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1em;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.5);
-}
-
-.btn-primary:active {
-    transform: translateY(0);
-}
-
-/* Quiz header */
+/* Quiz header — article > header gets Pico's card-header styling */
 
 .quiz-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    color: #666;
-    font-size: 0.95em;
-}
-
-.quiz-header strong {
-    color: #667eea;
 }
 
 /* Timer bar */
 
 .timer-bar-wrap {
-    height: 6px;
-    background: #f0f0f0;
-    border-radius: 3px;
+    height: 0.375rem;
+    background: var(--pico-muted-border-color);
+    border-radius: var(--pico-border-radius);
     overflow: hidden;
-    margin-bottom: 32px;
 }
 
 .timer-bar-wrap.hidden {
@@ -132,8 +55,8 @@ input[type="range"] {
 .timer-bar {
     height: 100%;
     width: 100%;
-    border-radius: 3px;
-    background: hsl(120, 70%, 48%);
+    border-radius: var(--pico-border-radius);
+    background: oklch(75% 0.16 140);
 }
 
 /* Quiz body */
@@ -142,8 +65,8 @@ input[type="range"] {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
-    min-height: 140px;
+    gap: var(--pico-spacing);
+    min-height: 8rem;
     justify-content: center;
 }
 
@@ -151,32 +74,32 @@ input[type="range"] {
 
 .attempts-row {
     display: flex;
-    gap: 12px;
+    justify-content: center;
+    gap: var(--pico-spacing);
 }
 
 .attempt-dot {
-    width: 18px;
-    height: 18px;
+    width: 1rem;
+    height: 1rem;
     border-radius: 50%;
-    border: 2px solid #ddd;
+    border: var(--pico-border-width) solid var(--pico-muted-border-color);
     background: transparent;
     transition: background 0.15s, border-color 0.15s;
 }
 
 .attempt-dot.active {
-    background: #667eea;
-    border-color: #667eea;
+    background: var(--pico-primary);
+    border-color: var(--pico-primary);
 }
 
 /* Feedback */
 
 .feedback {
     width: 100%;
-    padding: 14px 18px;
-    border-radius: 8px;
+    padding: var(--pico-spacing);
+    border-radius: var(--pico-border-radius);
+    border: var(--pico-border-width) solid;
     text-align: center;
-    font-size: 1em;
-    font-weight: 500;
 }
 
 .feedback.hidden {
@@ -184,40 +107,28 @@ input[type="range"] {
 }
 
 .feedback.correct {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: color-mix(in srgb, var(--pico-color-green-550) 12%, transparent);
+    border-color: var(--pico-color-green-550);
+    color: var(--pico-color-green-550);
 }
 
 .feedback.incorrect {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: color-mix(in srgb, var(--pico-color-red-550) 12%, transparent);
+    border-color: var(--pico-color-red-550);
+    color: var(--pico-color-red-550);
 }
 
 .feedback.try-again {
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffd666;
+    background: color-mix(in srgb, var(--pico-color-amber-550) 12%, transparent);
+    border-color: var(--pico-color-amber-550);
+    color: var(--pico-color-amber-550);
 }
 
 /* Hint */
 
 .hint {
-    color: #aaa;
-    font-size: 0.88em;
+    color: var(--pico-muted-color);
     text-align: center;
-}
-
-kbd {
-    display: inline-block;
-    padding: 1px 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #f8f9fa;
-    color: #555;
-    font-size: 0.85em;
-    font-family: inherit;
 }
 
 /* Session report */
@@ -225,8 +136,7 @@ kbd {
 .report-summary {
     display: flex;
     justify-content: center;
-    gap: 36px;
-    margin-bottom: 28px;
+    gap: calc(var(--pico-spacing) * 2);
 }
 
 .stat {
@@ -236,83 +146,33 @@ kbd {
 .stat-value {
     display: block;
     font-size: 2em;
-    font-weight: 700;
-    color: #667eea;
-    line-height: 1.1;
+    color: var(--pico-primary);
+    line-height: 1;
 }
 
 .stat-label {
-    display: block;
-    font-size: 0.78em;
-    color: #aaa;
+    color: var(--pico-muted-color);
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-top: 4px;
-}
-
-.report-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 28px;
-    font-size: 0.9em;
 }
 
 .report-table th {
     text-align: left;
-    padding: 8px 10px;
-    border-bottom: 2px solid #eee;
-    color: #aaa;
-    font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.75em;
-    letter-spacing: 0.6px;
 }
 
-.report-table td {
-    padding: 9px 10px;
-    border-bottom: 1px solid #f4f4f4;
-    color: #444;
-}
-
-.report-table .pattern {
-    font-family: monospace;
-    letter-spacing: 2px;
-    color: #667eea;
-}
 
 .row-correct td:nth-child(4) {
-    color: #28a745;
-    font-weight: 700;
+    color: var(--pico-color-green-550);
 }
 
 .row-incorrect td:nth-child(4) {
-    color: #dc3545;
-    font-weight: 700;
+    color: var(--pico-color-red-550);
 }
 
-/* Section heading between report tables */
+/* Section heading */
 
 .section-heading {
     font-size: 1em;
-    font-weight: 600;
-    color: #aaa;
+    color: var(--pico-muted-color);
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin: 24px 0 12px;
-}
-
-/* Checkbox setting row */
-
-.setting-row--checkbox label {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-}
-
-.setting-row--checkbox input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: #667eea;
-    cursor: pointer;
 }

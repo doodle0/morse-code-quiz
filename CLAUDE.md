@@ -6,6 +6,7 @@ A web application that tests users on morse code recognition by playing morse co
 ## Technical Stack
 - Vanilla HTML/CSS/JavaScript
 - Web Audio API for sound generation
+- Pico CSS v2 (classless) for base styles and design tokens
 
 ## Architecture
 - **sound-engine.js** — `SoundEngine` class. Generates sine wave tones via Web Audio API. Singleton: `soundEngine`.
@@ -66,7 +67,7 @@ Each question plays a random character in morse code and waits for the user to r
 
 - Each question allows **up to 3 attempts**.
 - **Correct answer**: show `Correct! "X" is .-`, auto-advance after 1.2s.
-- **Wrong answer, attempts remaining**: show `Wrong. Try again — N attempt(s) left`, auto-replay morse after 1.2s, return to `awaiting` with fresh timer.
+- **Wrong answer, attempts remaining**: show `Wrong. Try again — N attempt(s) left` (or `Time's up! Try again…` on timeout), auto-replay morse after 1.2s, return to `awaiting` with fresh timer.
 - **Wrong answer, no attempts left**: show `Answer: "X" (.-)`, auto-advance after 1.8s. Counts as incorrect for the session.
 - **Timeout** (time limit exceeded in `awaiting`): treated as a wrong attempt. Same flow as wrong answer.
 - Score tracks: correct questions / total questions (not attempts). Streak increments on **any correct answer** (even if not first attempt), resets only when a question is fully failed (all attempts exhausted or timed out on last attempt).
@@ -75,10 +76,10 @@ Each question plays a random character in morse code and waits for the user to r
 
 ## Time Limit
 
-- User sets a per-question time limit in settings: **0.5s – 10s** in 0.5s steps.
+- User sets a per-question time limit in settings: **0 (off) – 10s** in 0.5s steps.
 - Timer starts when state enters `awaiting`.
 - Timer resets on each new attempt — both after a wrong-answer replay and after a Space replay.
-- Timer displayed as a **color-coded progress bar**: green (full) → yellow → red (empty).
+- Timer displayed as a **color-coded progress bar**: green (full) → orange-red (empty), using OKLCH hue 140→20.
 - On expiry: counts as a wrong attempt, same handling as a wrong keypress.
 
 ---
@@ -90,7 +91,9 @@ Each question plays a random character in morse code and waits for the user to r
 | Questions per session | 10 | 5 – 50, step 5 |
 | WPM (speed) | 5 | 1 – 25, step 1 |
 | Frequency | 600 Hz | 400 – 900 Hz, step 50 |
-| Time limit per question | 5s | 0.5s – 10s, step 0.5s |
+| Time limit per question | 5s | 0 (off) – 10s, step 0.5s |
+| Letters (A–Z) | on | checkbox |
+| Digits (0–9) | off | checkbox |
 
 ---
 
@@ -102,7 +105,10 @@ Shown after all questions in the session are completed.
 - Correct / total questions
 - Overall accuracy %
 - Longest streak during session
-- Per-question table: character, morse pattern, correct/wrong, attempts used, total time on question
+- Per-question table: character, morse pattern, correct/wrong, attempts used, think time
+- Per-character table: character, morse pattern, times asked, avg attempts, avg think time — sorted by slowest avg think time descending
+
+> **Think time** = cumulative time spent in `awaiting` state only. Playback durations (initial play, replays) are excluded.
 
 **Actions:**
 - "Start New Session" — returns to session-start (settings screen)
@@ -110,5 +116,6 @@ Shown after all questions in the session are completed.
 ---
 
 ## Character Set
-- Letters A–Z (default, beginner)
-- Digits 0–9 defined in `MORSE_CODE` but not yet used in quiz
+- Letters A–Z and digits 0–9 are each independently toggled via session settings
+- At least one group must be enabled; Start button disables itself (with a message) when both are off
+- Session pool = letters (if on) + digits (if on), sampled uniformly

@@ -18,12 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const sFreqVal       = document.getElementById('s-freqVal');
     const sTimelimit     = document.getElementById('s-timelimit');
     const sTimelimitVal  = document.getElementById('s-timelimitVal');
+    const sLetters       = document.getElementById('s-letters');
+    const sDigits        = document.getElementById('s-digits');
     const startSessionBtn = document.getElementById('startSessionBtn');
 
     const questionNumEl  = document.getElementById('questionNum');
     const questionTotalEl = document.getElementById('questionTotal');
     const scoreEl        = document.getElementById('score');
     const streakEl       = document.getElementById('streak');
+    const timerBarWrap   = document.getElementById('timerBarWrap');
     const timerBar       = document.getElementById('timerBar');
     const feedbackEl     = document.getElementById('feedback');
     const dots           = [
@@ -56,7 +59,15 @@ document.addEventListener('DOMContentLoaded', () => {
     bindSlider(sQuestions,  sQuestionsVal,  v => v);
     bindSlider(sWpm,        sWpmVal,        v => v);
     bindSlider(sFreq,       sFreqVal,       v => v);
-    bindSlider(sTimelimit,  sTimelimitVal,  v => `${v}s`);
+    bindSlider(sTimelimit,  sTimelimitVal,  v => +v === 0 ? 'Off' : v + ' s');
+
+    function updateStartBtn() {
+        const ok = sLetters.checked || sDigits.checked;
+        startSessionBtn.disabled  = !ok;
+        startSessionBtn.textContent = ok ? 'Start Session' : 'Select at least one character set';
+    }
+    sLetters.addEventListener('change', updateStartBtn);
+    sDigits.addEventListener('change', updateStartBtn);
 
     // --- Screen helpers ---
     function showScreen(el) {
@@ -71,7 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
             wpm:           +sWpm.value,
             frequency:     +sFreq.value,
             timeLimitSecs: +sTimelimit.value, // 0 = off
-            includeDigits: document.getElementById('s-digits').checked,
+            includeLetters: sLetters.checked,
+            includeDigits:  sDigits.checked,
         };
         morsePlayer.wpm       = settings.wpm;
         morsePlayer.frequency = settings.frequency;
@@ -85,6 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         questionTotalEl.textContent = settings.questionsPerSession;
+        timerBarWrap.classList.toggle('hidden', settings.timeLimitSecs === 0);
 
         showScreen(screenQuiz);
         nextQuestion();
@@ -99,10 +112,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         session.index++;
         question = {
-            char:         pickRandom(),
-            attemptsLeft: 3,
-            attemptsUsed: 0,
-            startTime:    Date.now(),
+            char:          pickRandom(),
+            attemptsLeft:  3,
+            attemptsUsed:  0,
+            thinkTime:     0,
+            awaitingStart: null,
         };
 
         questionNumEl.textContent = session.index;
@@ -115,9 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function pickRandom() {
-        const pool = settings.includeDigits
-            ? morsePlayer.getCharacters()
-            : morsePlayer.getLetters();
+        const pool = [
+            ...(settings.includeLetters ? morsePlayer.getLetters() : []),
+            ...(settings.includeDigits  ? morsePlayer.getDigits()  : []),
+        ];
         return pool[Math.floor(Math.random() * pool.length)];
     }
 
@@ -135,8 +150,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function enterAwaiting() {
         state = 'awaiting';
+        question.awaitingStart = Date.now();
         setHint('awaiting');
         startTimer();
+    }
+
+    function pauseThinkTimer() {
+        if (question.awaitingStart !== null) {
+            question.thinkTime += (Date.now() - question.awaitingStart) / 1000;
+            question.awaitingStart = null;
+        }
     }
 
     // --- Timer ---
@@ -150,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function tick() {
             const pct = Math.max(0, 1 - (Date.now() - startAt) / limitMs);
             timerBar.style.width = (pct * 100) + '%';
-            timerBar.style.background = `hsl(${Math.round(pct * 120)}, 70%, 48%)`;
+            timerBar.style.background = `oklch(75% 0.16 ${Math.round(20 + pct * 120)})`;
         }
         tick();
         timerTickHandle = setInterval(tick, 50);
@@ -159,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
             stopTimer();
             if (state === 'awaiting') {
                 state = 'feedback';
+                pauseThinkTimer();
                 handleWrong(true);
             }
         }, limitMs);
@@ -176,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (state !== 'awaiting' || isPlaying) return;
         state = 'feedback';
         stopTimer();
+        pauseThinkTimer();
 
         if (key.toUpperCase() === question.char) {
             question.attemptsUsed++;
@@ -194,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
         streakEl.textContent = session.streak;
 
         const pattern = morsePlayer.getMorsePattern(question.char);
-        setFeedback('correct', `Correct! "${question.char}" is ${pattern}`);
+        setFeedback('correct', `Correct! "${question.char}" is <code>${pattern}</code>`);
         logQuestion(true);
         setTimeout(nextQuestion, 1200);
     }
@@ -209,7 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (question.attemptsLeft <= 0) {
             session.streak       = 0;
             streakEl.textContent = 0;
-            setFeedback('incorrect', `Answer: "${question.char}" (${pattern})`);
+            setFeedback('incorrect', `Answer: "${question.char}" (<code>${pattern}</code>)`);
             logQuestion(false);
             setTimeout(nextQuestion, 1800);
         } else {
@@ -228,14 +253,14 @@ document.addEventListener('DOMContentLoaded', () => {
             char:      question.char,
             correct,
             attempts:  question.attemptsUsed,
-            timeTaken: (Date.now() - question.startTime) / 1000,
+            timeTaken: question.thinkTime,
         });
     }
 
     // --- UI helpers ---
     function setFeedback(type, msg) {
-        feedbackEl.textContent = msg;
-        feedbackEl.className   = `feedback ${type}`;
+        feedbackEl.innerHTML = msg;
+        feedbackEl.className = `feedback ${type}`;
     }
 
     function updateDots() {
@@ -248,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (s === 'playing') {
             hintEl.textContent = 'Playing\u2026';
         } else {
-            hintEl.innerHTML = 'Press <kbd>Space</kbd> to replay \u00b7 Type any letter to answer';
+            hintEl.innerHTML = 'Press <kbd>Space</kbd> to replay \u00b7 Type any letter or digit to answer';
         }
     }
 
@@ -281,16 +306,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         reportSummaryEl.innerHTML = `
             <div class="stat">
-                <div class="stat-value">${correct}/${total}</div>
-                <div class="stat-label">Correct</div>
+                <strong class="stat-value">${correct}/${total}</strong>
+                <small class="stat-label">Correct</small>
             </div>
             <div class="stat">
-                <div class="stat-value">${accuracy}%</div>
-                <div class="stat-label">Accuracy</div>
+                <strong class="stat-value">${accuracy}%</strong>
+                <small class="stat-label">Accuracy</small>
             </div>
             <div class="stat">
-                <div class="stat-value">${session.longestStreak}</div>
-                <div class="stat-label">Best Streak</div>
+                <strong class="stat-value">${session.longestStreak}</strong>
+                <small class="stat-label">Best Streak</small>
             </div>
         `;
 
@@ -298,8 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
             <tr class="${q.correct ? 'row-correct' : 'row-incorrect'}">
                 <td>${i + 1}</td>
                 <td><strong>${q.char}</strong></td>
-                <td class="pattern">${morsePlayer.getMorsePattern(q.char)}</td>
-                <td>${q.correct ? '✓' : '✗'}</td>
+                <td><code>${morsePlayer.getMorsePattern(q.char)}</code></td>
+                <td><strong>${q.correct ? '✔' : '✘'}</strong></td>
                 <td>${q.attempts}</td>
                 <td>${q.timeTaken.toFixed(1)}s</td>
             </tr>
@@ -309,7 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         charStatsBodyEl.innerHTML = charStats.map(s => `
             <tr>
                 <td><strong>${s.char}</strong></td>
-                <td class="pattern">${s.pattern}</td>
+                <td><code>${s.pattern}</code></td>
                 <td>${s.count}</td>
                 <td>${s.avgTries.toFixed(1)}</td>
                 <td>${s.avgTime.toFixed(1)}s</td>
@@ -328,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             if (state === 'awaiting' && !isPlaying) {
                 stopTimer();
+                pauseThinkTimer();
                 playChar();
             }
             return;

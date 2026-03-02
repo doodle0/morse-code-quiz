@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Morse Code Trainer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- Session Start -->
-    <div id="screen-start" class="screen">
-        <div class="container">
+    <main id="screen-start" class="screen container">
+        <article>
             <h1>Morse Code Trainer</h1>
-            <div class="settings">
+            <section class="settings">
                 <div class="setting-row">
                     <label>Questions per session: <strong id="s-questionsVal">10</strong></label>
                     <input type="range" id="s-questions" min="5" max="50" value="10" step="5">
@@ -26,57 +28,65 @@
                     <input type="range" id="s-freq" min="400" max="900" value="600" step="50">
                 </div>
                 <div class="setting-row">
-                    <label>Time limit: <strong id="s-timelimitVal">10s</strong></label>
-                    <input type="range" id="s-timelimit" min="0.5" max="10" value="5" step="0.5">
+                    <label>Time limit: <strong id="s-timelimitVal">5 s</strong></label>
+                    <input type="range" id="s-timelimit" min="0" max="10" value="5" step="0.5">
                 </div>
-                <div class="setting-row setting-row--checkbox">
+                <div class="setting-row">
                     <label>
-                        <input type="checkbox" id="s-digits">
-                        Include digits (0–9)
+                        <input type="checkbox" id="s-letters" role="switch" checked>
+                        Letters (A–Z)
                     </label>
                 </div>
-            </div>
+                <div class="setting-row">
+                    <label>
+                        <input type="checkbox" id="s-digits" role="switch">
+                        Digits (0–9)
+                    </label>
+                </div>
+            </section>
             <button id="startSessionBtn" class="btn-primary">Start Session</button>
-        </div>
-    </div>
+        </article>
+    </main>
 
     <!-- Quiz -->
-    <div id="screen-quiz" class="screen hidden">
-        <div class="container">
-            <div class="quiz-header">
+    <main id="screen-quiz" class="screen container hidden">
+        <article>
+            <header class="quiz-header">
                 <span>Q <strong id="questionNum">1</strong>/<strong id="questionTotal">10</strong></span>
                 <span>Score <strong id="score">0</strong></span>
                 <span>Streak <strong id="streak">0</strong></span>
-            </div>
-            <div id="timerBarWrap" class="timer-bar-wrap">
-                <div id="timerBar" class="timer-bar"></div>
-            </div>
-            <div class="quiz-body">
-                <div class="attempts-row">
+            </header>
+            <section>
+                <section id="timerBarWrap" class="timer-bar-wrap">
+                    <div id="timerBar" class="timer-bar"></div>
+                </section>
+                <section class="attempts-row">
                     <span class="attempt-dot active" id="dot0"></span>
                     <span class="attempt-dot active" id="dot1"></span>
                     <span class="attempt-dot active" id="dot2"></span>
-                </div>
+                </section>
+            </section>
+            <div class="quiz-body">
                 <div id="feedback" class="feedback hidden"></div>
-                <p id="hint" class="hint"></p>
+                <div class="hint"><small id="hint"></small></div>
             </div>
-        </div>
-    </div>
+        </article>
+    </main>
 
     <!-- Session End -->
-    <div id="screen-end" class="screen hidden">
-        <div class="container container--wide">
+    <main id="screen-end" class="screen container hidden">
+        <article>
             <h2>Session Complete</h2>
             <div id="reportSummary" class="report-summary"></div>
             <table class="report-table">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Char</th>
-                        <th>Pattern</th>
-                        <th>Result</th>
-                        <th>Tries</th>
-                        <th>Time</th>
+                        <th><small>#</small></th>
+                        <th><small>Char</small></th>
+                        <th><small>Pattern</small></th>
+                        <th><small>Result</small></th>
+                        <th><small>Tries</small></th>
+                        <th><small>Time</small></th>
                     </tr>
                 </thead>
                 <tbody id="reportBody"></tbody>
@@ -85,18 +95,18 @@
             <table class="report-table">
                 <thead>
                     <tr>
-                        <th>Char</th>
-                        <th>Pattern</th>
-                        <th>Asked</th>
-                        <th>Avg Tries</th>
-                        <th>Avg Time</th>
+                        <th><small>Char</small></th>
+                        <th><small>Pattern</small></th>
+                        <th><small>Asked</small></th>
+                        <th><small>Avg Tries</small></th>
+                        <th><small>Avg Time</small></th>
                     </tr>
                 </thead>
                 <tbody id="charStatsBody"></tbody>
             </table>
             <button id="newSessionBtn" class="btn-primary">Start New Session</button>
-        </div>
-    </div>
+        </article>
+    </main>
 
     <script src="sound-engine.js"></script>
     <script src="morse-player.js"></script>
